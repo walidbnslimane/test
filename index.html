@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[SYSTEM v4.0] - Solo Transformation</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --dark-blue: #060b19;
+            --panel-bg: rgba(10, 20, 40, 0.92);
+            --glow: 0 0 12px rgba(0, 243, 255, 0.5), 0 0 24px rgba(0, 243, 255, 0.2);
+            --glow-text: 0 0 8px rgba(0, 243, 255, 0.8);
+            --danger-red: #ff3355;
+            --gold: #ffd700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--dark-blue);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 100, 200, 0.15) 0%, transparent 80%),
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 10px;
+        }
+
+        .system-window {
+            width: 100%;
+            max-width: 520px;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
+            box-shadow: var(--glow), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            border-radius: 4px;
+            padding: 20px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .system-window::before {
+            content: "[ SYSTEM LOG PROTOCOL v4.0 ]";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--dark-blue);
+            padding: 0 10px;
+            color: var(--neon-blue);
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border: 1px solid var(--neon-blue);
+        }
+
+        /* Prominent Rank Card */
+        .rank-card {
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(0, 0, 0, 0.6) 100%);
+            border: 1px solid var(--neon-blue);
+            box-shadow: var(--glow);
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            border-radius: 3px;
+        }
+
+        .rank-title-label {
+            font-size: 0.7rem;
+            color: #a0c0d0;
+            letter-spacing: 2px;
+        }
+
+        .rank-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 3px;
+            text-shadow: var(--glow-text);
+            margin: 4px 0;
+        }
+
+        .currencies {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+
+        .currency-item { display: flex; align-items: center; gap: 5px; }
+
+        .section-title {
+            color: var(--neon-blue);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            border-left: 3px solid var(--neon-blue);
+            padding-left: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 8px;
+            text-align: center;
+        }
+
+        .stat-name { font-size: 0.7rem; color: #a0c0d0; }
+        .stat-value { font-weight: bold; color: #fff; font-size: 1rem; text-shadow: var(--glow-text); }
+
+        /* Streaks Grid */
+        .streak-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .streak-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .streak-count {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* XP Bar */
+        .xp-container { margin-bottom: 15px; }
+        .xp-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            color: #a0c0d0;
+        }
+
+        .xp-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0088ff, var(--neon-blue));
+            box-shadow: var(--glow);
+            transition: width 0.4s ease;
+        }
+
+        /* Quests List */
+        .quest-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quest-item {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quest-item.completed {
+            border-color: rgba(0, 255, 100, 0.4);
+            opacity: 0.5;
+        }
+
+        .quest-info { display: flex; flex-direction: column; gap: 2px; }
+        .quest-title { font-size: 0.85rem; font-weight: 600; }
+        .quest-reward { font-size: 0.7rem; color: var(--neon-blue); }
+
+        .quest-actions { display: flex; gap: 6px; }
+
+        .btn-complete {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-complete:hover { background: var(--neon-blue); color: #000; }
+        .btn-complete:disabled { border-color: #555; color: #555; cursor: not-allowed; background: transparent; }
+
+        .btn-fail {
+            background: transparent;
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-fail:hover { background: var(--danger-red); color: #fff; }
+
+        .quest-creator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .quest-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            padding: 8px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .btn-create {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* System Overlay Modals */
+        .system-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(6, 11, 25, 0.98);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 35px var(--neon-blue);
+            padding: 20px;
+            text-align: center;
+            width: 88%;
+            max-width: 420px;
+            z-index: 200;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .system-modal.active { transform: translate(-50%, -50%) scale(1); }
+        .system-modal.danger { border-color: var(--danger-red); box-shadow: 0 0 35px var(--danger-red); }
+        .system-modal.gold { border-color: var(--gold); box-shadow: 0 0 35px var(--gold); }
+
+        .system-modal h2 { font-size: 1.5rem; text-shadow: var(--glow-text); }
+        .system-modal p { margin-top: 8px; font-size: 0.85rem; color: #d0e0f0; }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--neon-blue);
+            color: #fff;
+            padding: 8px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .modal-btn {
+            margin-top: 15px;
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 8px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-reset-day {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="system-window">
+        <!-- Upgraded Prominent Rank HUD -->
+        <div class="rank-card">
+            <div class="rank-title-label">PLAYER RANK & CLASSIFICATION</div>
+            <div class="rank-display" id="rank-display">E-RANK (CIVILIAN)</div>
+            <div style="font-size: 0.75rem; color: var(--neon-blue);" id="rank-subtext">Tier 1: Foundation Protocol</div>
+        </div>
+
+        <div class="currencies">
+            <div class="currency-item"><span>WEEK:</span> <b id="week-val" style="color:var(--neon-blue)">1 / 8</b></div>
+            <div class="currency-item"><span>LEVEL:</span> <b id="lvl-val" style="color:#fff">1</b></div>
+            <div class="currency-item"><span>COINS:</span> <b id="coins-val" style="color:var(--gold)">0 🪙</b></div>
+        </div>
+
+        <div class="xp-container">
+            <div class="xp-header">
+                <span>EXP PROGRESS</span>
+                <span id="xp-text">0 / 500</span>
+            </div>
+            <div class="xp-bar-bg">
+                <div class="xp-bar-fill" id="xp-fill"></div>
+            </div>
+        </div>
+
+        <div class="section-title">🔥 ACTIVE STREAKS (7-DAY MILESTONES)</div>
+        <div class="streak-grid">
+            <div class="streak-box"><span>No PMO</span> <span class="streak-count" id="pmo-streak">0 Days</span></div>
+            <div class="streak-box"><span>5x Prayer</span> <span class="streak-count" id="pray-streak">0 Days</span></div>
+            <div class="streak-box"><span>Bac Math</span> <span class="streak-count" id="study-streak">0 Days</span></div>
+            <div class="streak-box"><span>Calisthenics</span> <span class="streak-count" id="workout-streak">0 Days</span></div>
+        </div>
+
+        <div class="section-title">📊 PLAYER STATS (1-100)</div>
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-name">Faith</div><div class="stat-value" id="fth-val">15</div></div>
+            <div class="stat-box"><div class="stat-name">Discipline</div><div class="stat-value" id="dis-val">10</div></div>
+            <div class="stat-box"><div class="stat-name">Vitality</div><div class="stat-value" id="vit-val">10</div></div>
+            <div class="stat-box"><div class="stat-name">Strength</div><div class="stat-value" id="str-val">12</div></div>
+            <div class="stat-box"><div class="stat-name">Focus</div><div class="stat-value" id="fcs-val">10</div></div>
+            <div class="stat-box"><div class="stat-name">Knowledge</div><div class="stat-value" id="kno-val">15</div></div>
+        </div>
+
+        <div class="section-title">
+            <span>⚔️ DAILY QUEST BOARD</span>
+            <button class="btn-reset-day" onclick="resetDailyQuests()">Reset Daily</button>
+        </div>
+
+        <div class="quest-list" id="quest-list"></div>
+
+        <div class="section-title">➕ ADD DYNAMIC MISSION</div>
+        <div class="quest-creator">
+            <input type="text" id="custom-task-input" class="quest-input" placeholder="e.g., Read 15 pages, French grammar...">
+            <button class="btn-create" onclick="addCustomTask()">+ ADD</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Level Up Modal -->
+    <div class="system-modal" id="level-alert">
+        <h2 style="color:var(--neon-blue)">LEVEL UP!</h2>
+        <p>Your capabilities have expanded.</p>
+        <p style="color: var(--neon-blue); margin-top: 5px;">+5 Stat Points & +50 Coins Gained</p>
+        <button class="modal-btn" onclick="closeModal('level-alert')">ACCEPT PROTOCOL</button>
+    </div>
+
+    <!-- Streak Reward Modal -->
+    <div class="system-modal gold" id="reward-modal">
+        <h2 style="color:var(--gold)">🏆 7-DAY STREAK MILESTONE!</h2>
+        <p>You maintained discipline for 7 full days.</p>
+        <p>Enter your claimed reward for this achievement:</p>
+        <input type="text" id="reward-input" class="modal-input" placeholder="e.g., Beach Day, Marvel Movie, Special Meal...">
+        <button class="modal-btn" style="background:var(--gold)" onclick="claimStreakReward()">CLAIM REWARD</button>
+    </div>
+
+    <!-- Penalty Modal -->
+    <div class="system-modal danger" id="penalty-modal">
+        <h2 style="color:var(--danger-red)">🚨 QUEST FAILED - PENALTY ENFORCED</h2>
+        <p id="penalty-desc">Streak lost. State the penalty you will execute right now:</p>
+        <input type="text" id="penalty-input" class="modal-input" placeholder="e.g., 100 Burpees, Cold Shower, No Social Media 24h">
+        <button class="modal-btn" style="background:var(--danger-red); color:#fff;" onclick="submitPenalty()">EXECUTE PENALTY</button>
+    </div>
+
+    <script>
+        let playerData = {
+            level: 1,
+            week: 1,
+            xp: 0,
+            requiredXp: 500,
+            coins: 0,
+            activeFailId: null,
+            stats: { fth: 15, dis: 10, vit: 10, str: 12, fcs: 10, kno: 15 },
+            streaks: { pmo: 0, pray: 0, study: 0, workout: 0 },
+            quests: [
+                { id: 'q_pmo', title: '🛡️ Clean Slate (No PMO)', xp: 50, coins: 15, done: false, type: 'pmo' },
+                { id: 'q_pray', title: '🕌 Pray All 5 Daily Prayers', xp: 50, coins: 10, done: false, type: 'pray' },
+                { id: 'q_study', title: '📚 Bac Science Math Study (2.5h+)', xp: 60, coins: 15, done: false, type: 'study' },
+                { id: 'q_cals', title: '💪 Calisthenics Physique Session', xp: 40, coins: 10, done: false, type: 'workout' },
+                { id: 'q_calories', title: '🍲 Bulking Target (3,200 Calories)', xp: 40, coins: 10, done: false },
+                { id: 'q_scroll', title: '📵 Screen Time under 1.5 Hours', xp: 40, coins: 10, done: false }
+            ]
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('solo_system_v4');
+            if (saved) playerData = JSON.parse(saved);
+            updateUI();
+        }
+
+        function saveData() {
+            localStorage.setItem('solo_system_v4', JSON.stringify(playerData));
+        }
+
+        function getRankDetails(lvl) {
+            if (lvl >= 30) return { title: 'S-RANK (LEGEND)', sub: 'Tier 7: Apex Absolute' };
+            if (lvl >= 25) return { title: 'A-RANK (COMMANDER)', sub: 'Tier 6: Master Strategist' };
+            if (lvl >= 20) return { title: 'B-RANK (ELITE)', sub: 'Tier 5: High Discipline' };
+            if (lvl >= 15) return { title: 'C-RANK (KNIGHT)', sub: 'Tier 4: Proven Warrior' };
+            if (lvl >= 10) return { title: 'D-RANK (WARRIOR)', sub: 'Tier 3: Combat Ready' };
+            if (lvl >= 5)  return { title: 'E-RANK (RECRUIT)', sub: 'Tier 2: Conditioning Phase' };
+            return { title: 'E-RANK (CIVILIAN)', sub: 'Tier 1: Foundation Protocol' };
+        }
+
+        function updateUI() {
+            document.getElementById('lvl-val').innerText = playerData.level;
+            document.getElementById('week-val').innerText = `${playerData.week} / 8`;
+            document.getElementById('coins-val').innerText = `${playerData.coins} 🪙`;
+            
+            const rankInfo = getRankDetails(playerData.level);
+            document.getElementById('rank-display').innerText = rankInfo.title;
+            document.getElementById('rank-subtext').innerText = rankInfo.sub;
+
+            document.getElementById('xp-text').innerText = `${playerData.xp} / ${playerData.requiredXp}`;
+            const pct = Math.min((playerData.xp / playerData.requiredXp) * 100, 100);
+            document.getElementById('xp-fill').style.width = `${pct}%`;
+
+            // Streaks
+            document.getElementById('pmo-streak').innerText = `${playerData.streaks.pmo} Days`;
+            document.getElementById('pray-streak').innerText = `${playerData.streaks.pray} Days`;
+            document.getElementById('study-streak').innerText = `${playerData.streaks.study} Days`;
+            document.getElementById('workout-streak').innerText = `${playerData.streaks.workout} Days`;
+
+            // Stats
+            document.getElementById('fth-val').innerText = playerData.stats.fth;
+            document.getElementById('dis-val').innerText = playerData.stats.dis;
+            document.getElementById('vit-val').innerText = playerData.stats.vit;
+            document.getElementById('str-val').innerText = playerData.stats.str;
+            document.getElementById('fcs-val').innerText = playerData.stats.fcs;
+            document.getElementById('kno-val').innerText = playerData.stats.kno;
+
+            // Quests
+            const questListEl = document.getElementById('quest-list');
+            questListEl.innerHTML = '';
+
+            playerData.quests.forEach(q => {
+                const item = document.createElement('div');
+                item.className = `quest-item ${q.done ? 'completed' : ''}`;
+                item.innerHTML = `
+                    <div class="quest-info">
+                        <span class="quest-title">${q.title}</span>
+                        <span class="quest-reward">+${q.xp} EXP | +${q.coins} 🪙</span>
+                    </div>
+                    <div class="quest-actions">
+                        <button class="btn-complete" onclick="completeQuest('${q.id}')" ${q.done ? 'disabled' : ''}>
+                            ${q.done ? 'CLEARED' : 'COMPLETE'}
+                        </button>
+                        <button class="btn-fail" onclick="triggerFail('${q.id}')">FAIL</button>
+                    </div>
+                `;
+                questListEl.appendChild(item);
+            });
+        }
+
+        function completeQuest(id) {
+            const q = playerData.quests.find(item => item.id === id);
+            if (q && !q.done) {
+                q.done = true;
+                playerData.coins += q.coins;
+
+                if (q.type && playerData.streaks[q.type] !== undefined) {
+                    playerData.streaks[q.type] += 1;
+                    
+                    // Check for 7-day streak milestone reward
+                    if (playerData.streaks[q.type] > 0 && playerData.streaks[q.type] % 7 === 0) {
+                        document.getElementById('reward-modal').classList.add('active');
+                    }
+                }
+
+                // Increment stats based on quest type
+                if (q.id === 'q_pmo') playerData.stats.dis += 1;
+                if (q.id === 'q_pray') playerData.stats.fth += 1;
+                if (q.id === 'q_study') playerData.stats.kno += 1;
+                if (q.id === 'q_cals') playerData.stats.str += 1;
+                if (q.id === 'q_calories') playerData.stats.vit += 1;
+
+                addXp(q.xp);
+                saveData();
+                updateUI();
+            }
+        }
+
+        function triggerFail(id) {
+            playerData.activeFailId = id;
+            document.getElementById('penalty-input').value = '';
+            document.getElementById('penalty-modal').classList.add('active');
+        }
+
+        function submitPenalty() {
+            const penaltyText = document.getElementById('penalty-input').value.trim();
+            if (!penaltyText) {
+                alert("You must state your penalty before proceeding.");
+                return;
+            }
+
+            const q = playerData.quests.find(item => item.id === playerData.activeFailId);
+            if (q) {
+                if (q.type && playerData.streaks[q.type] !== undefined) {
+                    playerData.streaks[q.type] = 0; // Reset streak
+                }
+                playerData.xp = Math.max(0, playerData.xp - 40); // Lose XP
+            }
+
+            alert(`PENALTY LOGGED: "${penaltyText}". Execute immediately.`);
+            closeModal('penalty-modal');
+            saveData();
+            updateUI();
+        }
+
+        function claimStreakReward() {
+            const reward = document.getElementById('reward-input').value.trim();
+            if (reward) {
+                alert(`STREAK REWARD UNLOCKED: You earned "${reward}"! Enjoy it.`);
+            }
+            closeModal('reward-modal');
+        }
+
+        function addCustomTask() {
+            const input = document.getElementById('custom-task-input');
+            const title = input.value.trim();
+            if (!title) return;
+
+            playerData.quests.push({
+                id: 'custom_' + Date.now(),
+                title: title,
+                xp: 30,
+                coins: 5,
+                done: false
+            });
+
+            input.value = '';
+            saveData();
+            updateUI();
+        }
+
+        function addXp(amount) {
+            playerData.xp += amount;
+            if (playerData.xp >= playerData.requiredXp) {
+                playerData.xp -= playerData.requiredXp;
+                playerData.level += 1;
+                playerData.week = Math.min(8, Math.floor(playerData.level / 2) + 1);
+                playerData.requiredXp = Math.floor(playerData.requiredXp * 1.2);
+                playerData.coins += 50;
+                
+                document.getElementById('level-alert').classList.add('active');
+            }
+        }
+
+        function resetDailyQuests() {
+            if (confirm("Reset daily quests for today? (Streaks stay intact)")) {
+                playerData.quests.forEach(q => q.done = false);
+                saveData();
+                updateUI();
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        loadData();
+    </script>
+</body>
+          </html>
